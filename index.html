@@ -1,0 +1,242 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no" />
+    <title>ArcGIS API for JavaScript Tutorials: Display a map</title>
+
+    <style>
+      html,
+      body,
+      #viewDiv {
+        padding: 0;
+        margin: 0;
+        height: 100%;
+        width: 100%;
+      }
+    </style>
+
+    <link rel="stylesheet" href="https://js.arcgis.com/4.20/esri/themes/light/main.css">
+    <script src="https://js.arcgis.com/4.20/"></script>
+
+    <script>
+      require(["esri/config", 
+               "esri/Map", 
+               "esri/views/MapView", 
+               "esri/Graphic", 
+               "esri/layers/GraphicsLayer", 
+               "esri/layers/FeatureLayer"
+              ], 
+              function (esriConfig,Map, MapView, Graphic, GraphicsLayer, FeatureLayer) {
+        
+        esriConfig.apiKey = "AAPK6ff6b1bfb2204c978419580743f67c65RSherL5tOSbquNtCafJGpUWpJTAWSn1odstJ-ixUPEcqqdQfoia2LznDL0HQBq_-";
+
+        const map = new Map({
+          basemap: "arcgis-topographic" // Basemap layer service
+        });
+
+        const view = new MapView({
+          map: map,
+          center: [-107.7995, 37.257], // Longitude, latitude // default -107.7995, 37.257
+          zoom: 5, // Zoom level
+          container: "viewDiv" // Div element
+        });
+        
+        
+        // Define a pop-up for Cloud-based Mining Sites for Mining Crypto Currencies
+        const popupMiners = {
+          "title": "Cloud-based Mining Sites for Mining Crypto Currencies",
+          "content": "<b>Site name:</b> {site_name}<br><b>Based in:</b> {datacenter_locations}<br><b>Recommendations:</b> {overall_rating}<br><b>Rating for available tools:</b> {tools_rating}<br><b>Rating for tech-assist:</b> {tech_rating}<br><b>Profitability as an individual:</b> {profits_rating}<br><b>Details on contracts:</b> {contracts}"
+        };
+        
+        const minerRenderer = {
+          type: "simple",
+          symbol: {
+            color: [251, 54, 151, 0.3],
+            outline: {color: [255, 254, 251, 0.5], width: 2},
+            type: "simple-marker",
+            style: "diamond",
+            size: 50
+          },
+        };
+        
+        const miners = new FeatureLayer({
+          url: "https://services3.arcgis.com/aSCboO5BYMNMNXWs/arcgis/rest/services/cloudbased_mining_sites_for_mining_crypto_currencies/FeatureServer/0",
+          outFields: ["site_name","datacenter_locations","overall_rating","tools_rating","tech_rating","profits_rating","contracts"],
+          popupTemplate: popupMiners,
+          renderer: minerRenderer
+        });
+        
+        // Define a pop-up for Comparing Countries’ HashRate over Electricity Consumption
+        const popupIndex = {
+          "title": "Index of HashRate over Electricity Consumption per Country",
+          "content": "<b>Country:</b> {country}<br><b>HashRate:</b> {global_hashrate} %<br><b>Population (est. 2021):</b> {population}<br><b>Renewable electricity rate:</b> {renewable_electricity_rate}%<br><b>Rating for tech-assist:</b> {electricity_price} $USD/kWh<br><b>Electricity used for crypto-mining (est. 2020):</b> {electricity_usage} kWh"
+        };
+        
+        const indexRenderer = {
+          type: "simple",
+          symbol: {
+            color: [251, 154, 51, .3],
+            outline: {color: [255, 254, 251, 0.5], width: 2,},
+            type: "simple-marker",
+            style: "square",
+            width: 10,
+            size: 70
+          },
+        };
+        
+        
+        const index = new FeatureLayer({
+          url: "https://services3.arcgis.com/aSCboO5BYMNMNXWs/arcgis/rest/services/index_of_electricity_consumption_per_hashrate/FeatureServer/0",
+          outFields: ["country","global_hashrate","population","renewable_electricity_rate","electricity_price","electricity_usage"],
+          popupTemplate: popupIndex,
+          renderer: indexRenderer
+        });
+        
+        // Define a pop-up for Non-gasoline Alternative Fueling Stations
+        const popupNGAFStations = {
+          "title": "Non-gasoline Alternative Fueling Stations",
+          "content": "<b>Station name:</b> {Station_Na}<br><b>Fuel sources:</b> {Fuel_Type}<br><b>City:</b> {City}<br><b>Station Latitude:</b> {Latitude}<br><b>Station Longitude:</b> {Longitude}<br><b>Owner is:</b> {Owner_Type}"
+        };
+        
+        const stationRenderer = {
+          type: "simple",
+          symbol: {
+            color: "#00CBBF",
+            type: "simple-marker",
+            size: 5
+          },
+        };
+        
+        const ngafstations = new FeatureLayer({
+          url: "https://services3.arcgis.com/GVgbJbqm8hXASVYi/ArcGIS/rest/services/Non_Gasoline_Alternative_Fueling_Stations_2019/FeatureServer/0",
+          outFields: ["Station_Na","Fuel_Type","City","Latitude","Longitude","Owner_Type"],
+          popupTemplate: popupNGAFStations,
+          renderer: stationRenderer
+        });
+        
+
+        // Define a pop-up for Streams that are potential sources of hydro-power
+        const popupStreams = {
+          "title": "Stream",
+          "content": "<b>Stream name: </b>{STREAM_NM}<br><b>Length:</b> {Shape__Length} m"
+        };
+        
+        const streamRenderer = {
+          type: "simple",
+          symbol: {
+            color: "#0C7FB8",
+            type: "simple-line",
+          },
+        };
+        
+        const popupstreams = new FeatureLayer({
+          url: "https://services3.arcgis.com/GVgbJbqm8hXASVYi/ArcGIS/rest/services/Streams/FeatureServer/0",
+          outFields: ["STREAM_NM","Shape__Length"],
+          popupTemplate: popupStreams,
+          renderer: streamRenderer
+        });
+        
+        
+        
+        
+        // Define a pop-up for Distance from Electric Fueling Stations
+        const popupDistanceFEFS = {
+          "title": "Distance from Nearby Electric Fueling Stations",
+          "content": "<b>Approx. Distance:</b> {Name} mi<br><b>Zone Area:</b> {AnalysisArea} sq. mi"
+        };
+        
+        const popupdistancefefs = new FeatureLayer({
+          url: "https://services3.arcgis.com/GVgbJbqm8hXASVYi/ArcGIS/rest/services/Travel%20from%20Electric%20Fueling%20Stations%20(50%20100%20150%20Miles)/FeatureServer/0",
+          outFields: ["Name","AnalysisArea"],
+          popupTemplate: popupDistanceFEFS
+        });
+        
+        map.add(popupdistancefefs);
+        map.add(popupstreams);
+        map.add(index);
+        map.add(ngafstations);
+        map.add(miners);
+        
+        
+        
+        // Define a pop-up for Enriched Alternative Fueling Stations
+        //const popupEAFStations = {"title": "Enriched Alternative Fueling Stations","content": "<b>Station name:</b> {Station_Na}<br><b>Fuel type:</b> {Fuel_Type}<br><b>City:</b> {City}<br><b>Latitude:</b> {Latitude}<br><b>Longitude:</b> {Longitude}<br><b>Owner type:</b> {Owner_Type}<br><b>Country of source:</b> {sourceCountry}"};
+        
+       //const popupeafstations = new FeatureLayer({url: "https://services3.arcgis.com/GVgbJbqm8hXASVYi/ArcGIS/rest/services/Enriched%20Alternative%20Fueling%20Stations%20(Electric)/FeatureServer/0",outFields: ["Station_Na","Fuel_Type","City","Latitude","Longitude","Owner_Type","sourceCountry"],popupTemplate: popupEAFStations});
+        //map.add(popupeafstations);
+        
+        const graphicsLayer = new GraphicsLayer();
+        map.add(graphicsLayer);
+        
+        const point1 = { //Create a point
+          type: "point",
+          longitude: -38.5212,
+          latitude: -12.9857
+        };
+        
+        const point2 = { //Create a point
+          type: "point",
+          longitude: -21.5212,
+          latitude: 64.957
+        };
+        
+        const point3 = { //Create a point
+          type: "point",
+          longitude: -107.7995,
+          latitude: 37.257
+        };
+        
+        const simpleMarkerSymbol1 = {
+          type: "simple-marker",
+          color: [160, 123, 228],  // Orange 226,119,40 // Teal 58,173,148 // Lilac 160,123,228
+          outline: {
+            color: [55, 55, 55], // White 255,255,255
+            width: 1.2
+          }
+        };
+        
+        const simpleMarkerSymbol2 = {
+          type: "simple-marker",
+          color: "#25F5A6",  // Orange 226,119,40 // Teal 58,173,148 // Lilac 160,123,228
+          outline: {
+            color: [55, 55, 55], // White 255,255,255
+            width: 1.2
+          }
+        };
+        
+        const simpleMarkerSymbol3 = {
+          type: "simple-marker",
+          color: [255, 20, 50],  // Orange 226,119,40 // Teal 58,173,148 // Lilac 160,123,228
+          outline: {
+            color: [55, 55, 55], // White 255,255,255
+            width: 1.2
+          }
+        };
+        
+        const pointGraphic1 = new Graphic({
+          geometry: point1,
+          symbol: simpleMarkerSymbol1
+        });
+        graphicsLayer.add(pointGraphic1);
+
+        
+        const pointGraphic2 = new Graphic({
+          geometry: point2,
+          symbol: simpleMarkerSymbol2
+        });
+        graphicsLayer.add(pointGraphic2);
+        
+        const pointGraphic3 = new Graphic({
+          geometry: point3,
+          symbol: simpleMarkerSymbol3
+        });
+        graphicsLayer.add(pointGraphic3);
+        
+      });
+    </script>
+
+  </head>
+  <body>
+    <div id="viewDiv"></div>
+  </body>
+</html>
